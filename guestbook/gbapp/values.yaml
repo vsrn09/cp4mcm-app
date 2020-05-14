@@ -1,0 +1,19 @@
+appInClusterNamespace: default
+
+clusterReplicas: 1
+
+placement:
+  multicluster:
+    enabled: true
+    main:
+      labelSelector:
+        matchLabels:
+          environment: Dev
+    redismaster:
+      labelSelector:
+        matchLabels:
+          environment: Dev
+
+channel:
+  name: gbchn
+  namespace: gbchn

@@ -1,0 +1,55 @@
+apiVersion: app.ibm.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ template "guestbookapplication.fullname" . }}
+  labels:
+    app: {{ template "guestbookapplication.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  channel: {{ .Values.channel.namespace }}/{{ .Values.channel.name }}
+  packageFilter:
+    version: ">=1.x"
+    labelSelector:
+      matchLabels:
+        package: guestbook
+        component: main
+{{- if .Values.placement.multicluster.enabled }}
+  placement:
+    placementRef:
+      name: {{ template "guestbookapplication.fullname" . }}
+  overrides:
+  - clusterName: "/"
+    clusterOverrides:
+    - path: "metadata.namespace"
+      value: {{ .Values.appInClusterNamespace }}
+{{- end }}
+---
+apiVersion: app.ibm.com/v1alpha1
+kind: Subscription
+metadata:
+  name: {{ template "guestbookapplication.fullname" . }}-redismaster
+  labels:
+    app: {{ template "guestbookapplication.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  channel: {{ .Values.channel.namespace }}/{{ .Values.channel.name }}
+  packageFilter:
+    version: ">=1.x"
+    labelSelector:
+      matchLabels:
+        package: guestbook
+        component: redismaster
+{{- if .Values.placement.multicluster.enabled }}
+  placement:
+    placementRef:
+      name: {{ template "guestbookapplication.fullname" . }}-redismaster
+  overrides:
+  - clusterName: "/"
+    clusterOverrides:
+    - path: "metadata.namespace"
+      value: {{ .Values.appInClusterNamespace }}
+{{- end }}
